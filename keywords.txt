@@ -1,0 +1,23 @@
+#######################################
+# Syntax Coloring Map For Ultrasound
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+TridentTD_7Segs74HC595	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+init               KEYWORD2
+setNumber 	       KEYWORD2
+setText            KEYWORD2
+setTextScroll      KEYWORD2
+getVersion         KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
