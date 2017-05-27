@@ -26,23 +26,41 @@
 #include <Arduino.h>
 #include "TridentTD_7Segs74HC595.h"
 
-TridentTD_7Segs74HC595::TridentTD_7Segs74HC595(int SCLK, int RCLK, int DIO){
-  TridentTD_7Segs74HC595( SCLK, RCLK, DIO, 4);
+
+DigitalTube *modules;
+
+
+int sclk_p, rclk_p, dio_p, nModule;
+int col_index;
+
+TridentTD_7Segs74HC595::TridentTD_7Segs74HC595(int SCLK, int RCLK, int DIO, int num_module) {
+  sclk_p    = SCLK;
+  rclk_p    = RCLK;
+  dio_p     = DIO;
+  nModule   = num_module;
+  _module_i = 0;
+  col_index = 0;
+
+  modules = new DigitalTube[nModule];
+
+  pinMode(sclk_p,OUTPUT);
+  pinMode(rclk_p,OUTPUT);
+  pinMode(dio_p ,OUTPUT);
+
 }
 
-TridentTD_7Segs74HC595::TridentTD_7Segs74HC595(int SCLK, int RCLK, int DIO, int max_digits) {
-  _7segments.sclk       = SCLK;
-  _7segments.rclk       = RCLK;
-  _7segments.dio        = DIO;
-  _7segments.max_digits = (max_digits==4 || max_digits ==8)? max_digits : 4;
+bool TridentTD_7Segs74HC595::addModule(String module_name){
+  if(_module_i<nModule){
+    modules[_module_i++].name = module_name;
 
-  pinMode(_7segments.sclk,OUTPUT);
-  pinMode(_7segments.rclk,OUTPUT);
-  pinMode(_7segments.dio, OUTPUT);
+    setText(module_name,"    ");
+    return true;
+  }
+  return false;
 }
 
 void TridentTD_7Segs74HC595::init(){
-  digitalWrite(_7segments.rclk, HIGH);
+  digitalWrite(rclk_p, HIGH);
 
   #ifdef ESP_H
     timer1_isr_init();
@@ -51,11 +69,13 @@ void TridentTD_7Segs74HC595::init(){
     _isr_init(2000);
     _isr_add([]() {
   #endif
-      digitalWrite(_7segments.rclk, LOW);
-      shiftOut(_7segments.dio, _7segments.sclk, LSBFIRST, _7segments.columns[_7segments.col_index]);
-      shiftOut(_7segments.dio, _7segments.sclk, LSBFIRST, 0x80>> _7segments.col_index);  //pow(2, 7 - col_index ));
-      digitalWrite(_7segments.rclk, HIGH);
-      _7segments.col_index = (_7segments.col_index >= _7segments.max_digits-1 ? 0 : _7segments.col_index+1);
+      digitalWrite(rclk_p, LOW);
+      for(int i=nModule-1; i >=0; i--){
+        shiftOut(dio_p, sclk_p, LSBFIRST, modules[i].columns[col_index]);
+        shiftOut(dio_p, sclk_p, MSBFIRST, 1 << col_index);
+      }
+      digitalWrite(rclk_p, HIGH);
+      col_index = col_index >= MAX_DIGITS - 1 ? 0 : col_index + 1;
     });
   #ifdef ESP_H
     timer1_enable(TIM_DIV16, TIM_EDGE, TIM_LOOP);  //5MHz (5 ticks/us - 1677721.4 us max)
@@ -111,7 +131,20 @@ void TridentTD_7Segs74HC595::_isr_add(void (*isr)(), long microseconds)
 }
 #endif
 
-void TridentTD_7Segs74HC595::_setColumn(int col, int character, boolean addDot) {
+
+int TridentTD_7Segs74HC595::_getModuleIndex(String module_name){
+
+  if( module_name != ""){
+    for(int i=0; i< nModule; i++){
+      if( module_name == modules[i].name )
+        return i;
+    }
+  }
+  return 0;
+}
+
+void TridentTD_7Segs74HC595::_setColumn(int col, int character, boolean addDot, String module_name) {
+
   int idx;
   if((character >= 0)&&(character <= 9)){ idx = character; } 
   else if((character >= 32)&&(character <= 47)){ idx = (character ==45)? 62 : 63; }
@@ -119,20 +152,25 @@ void TridentTD_7Segs74HC595::_setColumn(int col, int character, boolean addDot) 
   else if((character >= '0')&&(character <= '9')) { idx = character - 48; } 
   else if((character >= 'A')&&(character <= 'Z')) { idx = character - 55; } 
   else if((character >= 'a')&&(character <= 'z')) { idx = character - 61; }
-  _7segments.columns[col] = _7segments.charmap[idx] & ((addDot)? 254: 255);
+  modules[_getModuleIndex(module_name)].columns[col] = charmap[idx] & ((addDot)? 254: 255);
 }
 
 
 void TridentTD_7Segs74HC595::setNumber(float f_number, int decimal){
-  decimal = (decimal > _7segments.max_digits - 1)? _7segments.max_digits-1 : decimal;
+  setNumber("", f_number, decimal);
+}
+
+void TridentTD_7Segs74HC595::setNumber(String module_name, float f_number, int decimal){
+
+  decimal = (decimal > MAX_DIGITS - 1)? MAX_DIGITS-1 : decimal;
   bool bZero = true;
-  int number =  ((int)((f_number+0.0001) * pow(10,decimal))) % (int)pow(10,_7segments.max_digits);
+  int number =  ((int)((f_number+0.0001) * pow(10,decimal))) % (int)pow(10,MAX_DIGITS);
   
   int value;
-  for(int col= _7segments.max_digits-1; col >= 0 ; col--){
+  for(int col= MAX_DIGITS-1; col >= 0 ; col--){
     value = ((int)(number / pow(10, col )))%10;
     if(value != 0) { bZero = false; }
-    _setColumn(col, (col>decimal&& bZero)? ' ':value, (col!=decimal || decimal ==0)? false:true );
+    _setColumn(col, (col>decimal&& bZero)? ' ':value, (col!=decimal || decimal ==0)? false:true, module_name );
     delay(1);
   }
 }
@@ -143,18 +181,38 @@ void TridentTD_7Segs74HC595::setText(String text){
 
 
   int chr_index=0;
-  for(int col=_7segments.max_digits -1; col >=0  ; col--){
+  for(int col=MAX_DIGITS -1; col >=0  ; col--){
     int character = (chr_index < len)? text_c[chr_index]:' ';
 
     boolean addDot= false;
     if(text[chr_index+1] == '.'){
       addDot = true; chr_index++;
     }
-    _setColumn( col, character, addDot);
+    _setColumn( col, character, addDot );
     chr_index++;
     delay(1);
   }
 }
+
+void TridentTD_7Segs74HC595::setText(String mudule_name, String text){
+  int len = text.length();
+  const char *text_c = text.c_str();
+
+
+  int chr_index=0;
+  for(int col=MAX_DIGITS -1; col >=0  ; col--){
+    int character = (chr_index < len)? text_c[chr_index]:' ';
+
+    boolean addDot= false;
+    if(text[chr_index+1] == '.'){
+      addDot = true; chr_index++;
+    }
+    _setColumn( col, character, addDot, mudule_name );
+    chr_index++;
+    delay(1);
+  }
+}
+
 
 void TridentTD_7Segs74HC595::setTextScroll(String text, int scrolltime ,int nLoop ){
   nLoop = (nLoop<=0)? 1 : nLoop;
@@ -176,6 +234,30 @@ void TridentTD_7Segs74HC595::setTextScroll(String text, int scrolltime ,int nLoo
     }
     
     setText("    ");
+    delay(scrolltime);
+  }
+}
+
+void TridentTD_7Segs74HC595::setTextScroll(String module_name, String text, int scrolltime ,int nLoop ){
+  nLoop = (nLoop<=0)? 1 : nLoop;
+  
+  for(int j = 0; j < nLoop; j++){
+    String text2 = String("    ")+ text;
+    int len      = text2.length();
+
+    for(int i = 0; i < len; i++) {
+      String subtext = text2.substring(0,8);
+      setText(module_name, subtext);
+      delay(scrolltime);
+
+      if(text2.substring(1,2) != "."){
+        text2 = text2.substring(1)+text2.substring(0,1);
+      }else{
+        text2 = text2.substring(2)+text2.substring(0,2);
+      }
+    }
+    
+    setText(module_name, "    ");
     delay(scrolltime);
   }
 }

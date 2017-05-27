@@ -46,34 +46,34 @@
 #define RESOLUTION 65536    // Timer1 is 16 bit
 #endif
 
-
-struct {
-  int  sclk, rclk, dio, max_digits =4;
-  int  col_index = 0;
-  int  columns[8];
-  int  charmap[65]= {
-          3,159,37,13,153,73,65,31,1,9,   // (0-9)0-9
-          17,1,99,3,97,113,67,145,243,135,145,227,85,19,3,49,25,115,73,31,129,129,169,145,137,37,       //(10-35)A-Z
-          5,193,229,133,33,113,9,209,247,143,81,227,85,213,197,49,25,245,73,225,199,199,169,145,137,37, //(36-61)a-z
-          253,255,53                      //(62)- , (63) space, (64) ?
-        };
-} _7segments;
+#define MAX_DIGITS 4
 
 
+struct DigitalTube{
+  String  name;
+  int     columns[4];
+};
 
 class TridentTD_7Segs74HC595 {
   public:
-    TridentTD_7Segs74HC595(int SCLK, int RCLK, int DIO);
-    TridentTD_7Segs74HC595(int SCLK, int RCLK, int DIO, int max_digits);  // SCLK : Serial Clock; RCLK : Register Clock; DIO = Serial Data
+    TridentTD_7Segs74HC595(int SCLK, int RCLK, int DIO, int num_module=1) ;  // SCLK : Serial Clock; RCLK : Register Clock; DIO = Serial Data
 
+    bool    addModule(String module_name);
     void    init();
     void    setNumber(float f_number, int decimal=2);
     void    setText(String text);
     void    setTextScroll(String text, int scrolltime=500 , int nLoop=1);
+
+    void    setNumber(String module_name, float f_number, int decimal=2);
+    void    setText(String mudule_name, String text);
+    void    setTextScroll(String mudule_name, String text, int scrolltime=500 , int nLoop=1);
+
     String  getVersion();
   private:
-    float   _version = 1.0;
-    void    _setColumn(int col, int character, boolean addDot=false);
+    float   _version = 2.0;
+    void    _setColumn(int col, int character, boolean addDot=false,String module_name="");
+    int     _getModuleIndex(String module_name);
+    int     _module_i;
  
     #ifndef ESP_H
     unsigned char clockSelectBits;
@@ -81,6 +81,13 @@ class TridentTD_7Segs74HC595 {
     void    _setPR(long microseconds);
     void    _isr_add(void (*isr)(), long microseconds=-1);
     #endif
+
+    int  charmap[65]= {
+            3,159,37,13,153,73,65,31,1,9,   // (0-9)0-9
+            17,1,99,3,97,113,67,145,243,135,145,227,85,19,3,49,25,115,73,31,129,129,169,145,137,37,       //(10-35)A-Z
+            5,193,229,133,33,113,9,209,247,143,81,227,85,213,197,49,25,245,73,225,199,199,169,145,137,37, //(36-61)a-z
+            253,255,53                      //(62)- , (63) space, (64) ?
+          };
 };
 
 
