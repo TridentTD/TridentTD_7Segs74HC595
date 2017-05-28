@@ -31,9 +31,9 @@ for both ***Arduino*** and ***ESP8266***.
 
 - my7SETMENT.**setTextScroll**(ชื่อโมดูล, text);
 
-- 
-  Version
-  =====
+
+Version
+=====
 
 1.0.0  **TridentTD_7Segs74HC595** 
 25 May 2560BE (Buddism Era), 2017
