@@ -11,18 +11,33 @@ for both ***Arduino*** and ***ESP8266***.
 
 
 - **TridentTD_7Segs74HC595**    *my7SEGMENT( **SCLK**, **RCLK**, **DIO**);*
-
+- my7SEGMENT.**init**();
 - my7SEGMENT.**setNumber**( float number, int decimal );
-
 - my7SEGMENT.**setText**( String text);
-
 - my7SEGMENT.**setTextScroll**( String text);
 
+![MultiModule_Chain.png](MultiModule_Chain.png)
+สามารถต่อพ่วงออกไปเรื่อยๆ และควบคุมแบบแยกโมดูลกันได้
 
-Version
-=====
+- **TridentTD_7Segs74HC595**    *my7SEGMENT( **SCLK**, **RCLK**, **DIO**, **จำนวนโมดูลที่จะต่อพ่วง**);*
+
+- my7SEGMENT.**addModule**( ตั้งชื่อโมดูล);
+
+- my7SEGMENT.**init**();
+
+- my7SEGMENT.**setNumber**( ชื่อโมดูล, number, decimal);
+
+- my7SEGMENT.**setText**(ชื่อโมดูล, text);
+
+- my7SETMENT.**setTextScroll**(ชื่อโมดูล, text);
+
+- 
+  Version
+  =====
 
 1.0.0  **TridentTD_7Segs74HC595** 
 25 May 2560BE (Buddism Era), 2017
+
+2.0.0 27 May 2560BE
 
 V. Phaisarn
