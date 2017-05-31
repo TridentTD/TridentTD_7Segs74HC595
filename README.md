@@ -6,7 +6,7 @@ TridentTD_7Segs74HC595
 **TridentTD_7Segs74HC595** is a library for  digital-tube 7segments module (74hc595) 
 for both ***Arduino*** and ***ESP8266***.
 
-![7Segments(74hc595).jpg](7Segments(74hc595).jpg)
+![7Segments74hc595.jpg](7Segments74hc595.jpg)
 
 
 

@@ -51,7 +51,7 @@
 
 struct DigitalTube{
   String  name;
-  int     columns[4];
+  int     columns[MAX_DIGITS];
 };
 
 class TridentTD_7Segs74HC595 {
