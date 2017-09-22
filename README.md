@@ -31,6 +31,7 @@ for both ***Arduino*** and ***ESP8266***.
 
 - my7SETMENT.**setTextScroll**(ชื่อโมดูล, text);
 
+[![MultiModule](https://img.youtube.com/vi/xTImDEo4euk/0.jpg)](https://youtu.be/xTImDEo4euk)euk)  
 
 Version
 =====
