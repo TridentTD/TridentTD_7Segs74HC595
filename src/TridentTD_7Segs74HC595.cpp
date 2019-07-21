@@ -168,20 +168,11 @@ void TridentTD_7Segs74HC595::setNumber(String module_name, float f_number, int d
   int number =  ((int)((f_number+0.0001) * pow(10,decimal))) % (int)pow(10,MAX_DIGITS);
   
   int value;
-  if(!_invert_mode) {
-    for(int col= MAX_DIGITS-1; col >= 0 ; col--){
-      value = ((int)(number / pow(10, col )))%10;
-      if(value != 0) { bZero = false; }
-      _setColumn(col, (col>decimal&& bZero)? ' ':value, (col!=decimal || decimal ==0)? false:true, module_name );
-      delay(1);
-    }
-  }else{
-    for(int col= 0; col < MAX_DIGITS ; col++){
-      value = ((int)(number / pow(10, col )))%10;
-      if(value != 0) { bZero = false; }
-      _setColumn(col, (col>decimal&& bZero)? ' ':value, (col!=decimal || decimal ==0)? false:true, module_name );
-      delay(1);
-    }
+  for(int col= MAX_DIGITS-1; col >= 0 ; col--){
+    value = ((int)(number / pow(10, col )))%10;
+    if(value != 0) { bZero = false; }
+    _setColumn((_invert_mode)? (MAX_DIGITS-1-col) : col, (col>decimal&& bZero)? ' ':value, (col!=decimal || decimal ==0)? false:true, module_name );
+    delay(1);
   }
 }
 
@@ -191,30 +182,16 @@ void TridentTD_7Segs74HC595::setText(String text){
 
 
   int chr_index=0;
-  if(!_invert_mode) {
-    for(int col=MAX_DIGITS -1; col >=0  ; col--){
-      int character = (chr_index < len)? text_c[chr_index]:' ';
+  for(int col=MAX_DIGITS -1; col >=0  ; col--){
+    int character = (chr_index < len)? text_c[chr_index]:' ';
 
-      boolean addDot= false;
-      if(text[chr_index+1] == '.'){
-        addDot = true; chr_index++;
-      }
-      _setColumn( col, character, addDot );
-      chr_index++;
-      delay(1);
+    boolean addDot= false;
+    if(text[chr_index+1] == '.'){
+      addDot = true; chr_index++;
     }
-  }else{
-    for(int col= 0; col < MAX_DIGITS ; col++){
-      int character = (chr_index < len)? text_c[chr_index]:' ';
-
-      boolean addDot= false;
-      if(text[chr_index+1] == '.'){
-        addDot = true; chr_index++;
-      }
-      _setColumn( col, character, addDot );
-      chr_index++;
-      delay(1);
-    }    
+    _setColumn( (_invert_mode)? (MAX_DIGITS-1-col) :col, character, addDot );
+    chr_index++;
+    delay(1);
   }
 }
 
@@ -224,31 +201,16 @@ void TridentTD_7Segs74HC595::setText(String mudule_name, String text){
 
 
   int chr_index=0;
-  if(!_invert_mode) {
-    for(int col=MAX_DIGITS -1; col >=0  ; col--){
-      int character = (chr_index < len)? text_c[chr_index]:' ';
+  for(int col=MAX_DIGITS -1; col >=0  ; col--){
+    int character = (chr_index < len)? text_c[chr_index]:' ';
 
-      boolean addDot= false;
-      if(text[chr_index+1] == '.'){
-        addDot = true; chr_index++;
-      }
-      _setColumn( col, character, addDot, mudule_name );
-      chr_index++;
-      delay(1);
+    boolean addDot= false;
+    if(text[chr_index+1] == '.'){
+      addDot = true; chr_index++;
     }
-  }else{
-    for(int col= 0; col < MAX_DIGITS ; col++){
-      int character = (chr_index < len)? text_c[chr_index]:' ';
-
-      boolean addDot= false;
-      if(text[chr_index+1] == '.'){
-        addDot = true; chr_index++;
-      }
-      _setColumn( col, character, addDot, mudule_name );
-      chr_index++;
-      delay(1);
-    }
-    
+    _setColumn( (_invert_mode)? (MAX_DIGITS-1-col):col, character, addDot, mudule_name );
+    chr_index++;
+    delay(1);
   }
 }
 
