@@ -14,6 +14,8 @@ void setup() {
   Serial.println(my7SEGMENT.getVersion());
 
   my7SEGMENT.init();
+  // my7SEGMENT.init(INVERT_MODE);   // หากต้องการให้แสดงผลเรียงใหม่แบบกลับตัวเลข 4 หลักหน้าไปหลัง
+
   my7SEGMENT.setTextScroll("ESP-8266");
 
 }

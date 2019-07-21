@@ -48,6 +48,7 @@
 
 #define MAX_DIGITS 4
 
+#define INVERT_MODE     1
 
 struct DigitalTube{
   String  name;
@@ -59,7 +60,7 @@ class TridentTD_7Segs74HC595 {
     TridentTD_7Segs74HC595(int SCLK, int RCLK, int DIO, int num_module=1) ;  // SCLK : Serial Clock; RCLK : Register Clock; DIO = Serial Data
 
     bool    addModule(String module_name);
-    void    init();
+    void    init(bool invert_mode=false);
     void    setNumber(float f_number, int decimal=2);
     void    setText(String text);
     void    setTextScroll(String text, int scrolltime=500 , int nLoop=1);
@@ -70,7 +71,8 @@ class TridentTD_7Segs74HC595 {
 
     String  getVersion();
   private:
-    float   _version = 2.0;
+    float   _version = 2.1;
+    bool    _invert_mode = false;
     void    _setColumn(int col, int character, boolean addDot=false,String module_name="");
     int     _getModuleIndex(String module_name);
     int     _module_i;
