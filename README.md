@@ -36,11 +36,11 @@ for both ***Arduino*** and ***ESP8266***.
 Version
 =====
 
-1.0.0  **TridentTD_7Segs74HC595** 
-25 May 2560BE (Buddism Era), 2017
-
-2.0.0 27 May 2560BE
-
-2.1   21 July 2562BE เพิ่มให้สามารถเรียง 7Segments กลับจากซ้ายไปขวา ขวาไปซ้ายด้านได้
-
-V. Phaisarn
+1.0.0  **TridentTD_7Segs74HC595**   
+25 May 2560BE (Buddism Era), 2017  
+  
+2.0.0 27 May 2560BE  
+  
+2.1   21 July 2562BE เพิ่มให้สามารถเรียง 7Segments กลับจากซ้ายไปขวา ขวาไปซ้ายด้านได้  
+  
+V. Phaisarn  
